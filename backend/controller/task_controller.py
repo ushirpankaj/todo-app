@@ -1,5 +1,5 @@
 from app import app,db
-from flask import jsonify
+from flask import jsonify, request
 from models.Task import Task
 
 @app.route("/")
@@ -25,10 +25,19 @@ def getTask(id):
 
 @app.route("/task/create", methods=["POST"])
 def createTask():
-    pass
+    data = request.get_json()
+
+    task = Task(**data)   # maps title, description, is_completed
+
+    db.session.add(task)
+    db.session.commit()
+
+    return {"msg": "Task Created", "id": task.id}, 201
 
 
-@app.route('/tasks/<int:id>', methods=['DELETE'])
+
+
+@app.route('/task/<int:id>', methods=['DELETE'])
 def delete_task(id):
     task = Task.query.get(id)
     if not task:
